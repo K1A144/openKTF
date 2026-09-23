@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm run build-prod",
+  "outputDirectory": "static",
+  "installCommand": "npm ci --ignore-scripts",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

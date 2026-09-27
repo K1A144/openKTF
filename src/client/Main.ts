@@ -1446,9 +1446,12 @@ class Client {
       this.usernameInput?.resolvedName() ?? fallbackPlayerName();
     const newLobbyHandle = joinLobby(this.eventBus, {
       gameID: lobby.gameID,
-      cosmetics: await getPlayerCosmeticsRefs({
-        verified: resolvedName.verified,
-      }),
+      cosmetics:
+        isSingleplayer && lobby.gameStartInfo?.players[0]?.cosmetics
+          ? (lobby.gameStartInfo.players[0].cosmetics as any)
+          : await getPlayerCosmeticsRefs({
+              verified: resolvedName.verified,
+            }),
       turnstileToken: await this.getTurnstileToken(lobby),
       playerName: resolvedName.name,
       playerClanTag: this.usernameInput?.getClanTag() ?? null,

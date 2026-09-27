@@ -97,11 +97,18 @@ export function getAssetManifest(): AssetManifest {
 export function getCdnBase(): string {
   if (
     typeof window !== "undefined" &&
-    window.BOOTSTRAP_CONFIG?.cdnBase !== undefined
+    window.BOOTSTRAP_CONFIG?.cdnBase !== undefined &&
+    window.BOOTSTRAP_CONFIG.cdnBase !== ""
   ) {
     return window.BOOTSTRAP_CONFIG.cdnBase;
   }
-  return globalThis.__CDN_BASE__ ?? "";
+  if (globalThis.__CDN_BASE__ !== undefined && globalThis.__CDN_BASE__ !== "") {
+    return globalThis.__CDN_BASE__;
+  }
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+  return "";
 }
 
 export function assetUrl(path: string): string {

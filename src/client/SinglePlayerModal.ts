@@ -59,7 +59,7 @@ import { terrainMapFileLoader } from "./TerrainMapFileLoader";
  * that time while the player is still choosing, which is what keeps the case
  * rare rather than routine.
  */
-export const START_PREPARE_DEADLINE_MS = 15_000;
+export const START_PREPARE_DEADLINE_MS = 500;
 
 /**
  * Ceiling on the CrazyGames midgame ad, deliberately far above

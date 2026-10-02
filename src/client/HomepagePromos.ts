@@ -185,10 +185,12 @@ export class HomepagePromos extends LitElement {
       // ids (see destroyBottomRail). The header ad must go too: nothing hides
       // #pw-oop-flex_container in-game and its docked state is fixed at the
       // viewport top, so it would sit over the map.
-      window.ramp.destroyUnits("pw-oop-left_rail");
-      window.ramp.destroyUnits("pw-oop-right_rail");
-      window.ramp.destroyUnits("pw-oop-flex");
-      console.log("successfully destroyed gutter rails and header ad");
+      if (typeof window.ramp?.destroyUnits === "function") {
+        window.ramp.destroyUnits("pw-oop-left_rail");
+        window.ramp.destroyUnits("pw-oop-right_rail");
+        window.ramp.destroyUnits("pw-oop-flex");
+        console.log("successfully destroyed gutter rails and header ad");
+      }
     } catch (e) {
       console.error("error destroying gutter rails and header ad", e);
     }
@@ -228,7 +230,7 @@ export class HomepagePromos extends LitElement {
     if (!this.bottomRailActive) return;
     this.bottomRailActive = false;
 
-    if (!window.ramp) return;
+    if (typeof window.ramp?.destroyUnits !== "function") return;
 
     try {
       window.ramp.destroyUnits("pw-oop-bottom_rail");
@@ -307,13 +309,18 @@ export class HomepagePromos extends LitElement {
     this.cornerAdDestroyed = true;
     if (!this.cornerAdLoaded) return;
     this.cornerAdLoaded = false;
+    if (typeof window.ramp?.destroyUnits !== "function") return;
     try {
       window.ramp
         .destroyUnits("corner_ad_video")
         // No-selector units can be registered under a pw-oop- id (see
         // destroyBottomRail); retry with the prefixed name if the plain
         // type isn't recognized.
-        .catch(() => window.ramp.destroyUnits("pw-oop-corner_ad_video"))
+        .catch(() => {
+          if (typeof window.ramp?.destroyUnits === "function") {
+            return window.ramp.destroyUnits("pw-oop-corner_ad_video");
+          }
+        })
         .then(() => console.log("corner_ad_video destroyed"))
         .catch((e: unknown) => {
           console.error("Error destroying corner_ad_video:", e);

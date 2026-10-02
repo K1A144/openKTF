@@ -14,6 +14,7 @@ import {
 } from "../core/Schemas";
 import { toWireGameStartInfo } from "../core/Util";
 import { GameEnv } from "../core/configuration/Config";
+import { GameType } from "../core/game/Game";
 import { UserSettings } from "../core/game/UserSettings";
 import "./AccountModal";
 import "./AccountSettingsModal";
@@ -1379,6 +1380,9 @@ class Client {
       lobby.gameStartInfo?.config ??
       lobby.publicLobbyInfo?.gameConfig ??
       lobby.gameRecord?.info.config;
+    const isSingleplayer =
+      lobby.source === "singleplayer" ||
+      joinConfig?.gameType === GameType.Singleplayer;
     const joinInfo = lobby.publicLobbyInfo;
     this.presenceInGame = false;
     this.presenceSpectating = lobby.spectator === true;
@@ -1402,7 +1406,7 @@ class Client {
       // withholds it for public FFA too, for the same reason the invite
       // button hides there: a friend joining that match is a team.
       lobbyId:
-        lobby.source === "singleplayer" || lobby.gameRecord !== undefined
+        isSingleplayer || lobby.gameRecord !== undefined
           ? undefined
           : presenceLobbyId(joinConfig, lobby.gameID),
     };
@@ -1419,8 +1423,8 @@ class Client {
         lobbyInfo: lobby.publicLobbyInfo,
       });
     }
-    // Only update URL immediately for private lobbies, not public ones
-    if (lobby.source !== "public") {
+    // Only update URL immediately for private lobbies, not public ones or singleplayer
+    if (lobby.source !== "public" && !isSingleplayer) {
       this.updateJoinUrlForShare(lobby.gameID);
     }
     // Singleplayer runs entirely locally, and the session is only used here
@@ -1428,7 +1432,6 @@ class Client {
     // via getAuthHeader(). So don't let a token refresh block starting a
     // local game (offline on Steam it waits out the 5s ticket timeout):
     // read the cached JWT and refresh in the background instead.
-    const isSingleplayer = lobby.source === "singleplayer";
     if (isSingleplayer) {
       void userAuth();
     }

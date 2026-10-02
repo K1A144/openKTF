@@ -41,7 +41,7 @@ import {
   decodeServerMessage,
   encodeClientMessage,
 } from "../core/ZbinWire";
-import { getPlayToken } from "./Auth";
+import { getPersistentID, getPlayToken } from "./Auth";
 import { LobbyConfig } from "./ClientGameRunner";
 import { clientPlatform } from "./ClientPlatform";
 import { isDesktopShell } from "./DesktopShell";
@@ -667,7 +667,7 @@ export class Transport {
       clanTag: this.lobbyConfig.playerClanTag ?? null,
       cosmetics: this.lobbyConfig.cosmetics,
       turnstileToken: this.lobbyConfig.turnstileToken,
-      token: await getPlayToken(),
+      token: this.isLocal ? getPersistentID() : await getPlayToken(),
       spectator: this.lobbyConfig.spectator,
       gitCommit: ClientEnv.gitCommit(),
       platform: clientPlatform(),
@@ -680,7 +680,7 @@ export class Transport {
       gameID: this.lobbyConfig.gameID,
       // Note: clientID is not sent - server looks it up from persistentID in token
       lastTurn: lastTurn,
-      token: await getPlayToken(),
+      token: this.isLocal ? getPersistentID() : await getPlayToken(),
       gitCommit: ClientEnv.gitCommit(),
     } satisfies ClientRejoinMessage);
   }

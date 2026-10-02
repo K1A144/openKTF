@@ -42,7 +42,7 @@ export class InGamePromo extends LitElement implements Controller {
   }
 
   private destroyBottomRail(): void {
-    if (!window.ramp) return;
+    if (typeof window.ramp?.destroyUnits !== "function") return;
 
     try {
       window.ramp.destroyUnits("pw-oop-bottom_rail");
@@ -129,8 +129,9 @@ export class InGamePromo extends LitElement implements Controller {
     this.adsVisible = false;
     this.destroyBottomRail();
 
-    if (!window.ramp) {
-      console.warn("Playwire RAMP not available for in-game ad");
+    if (typeof window.ramp?.destroyUnits !== "function") {
+      this.shouldShow = false;
+      this.requestUpdate();
       return;
     }
     this.shouldShow = false;

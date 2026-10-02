@@ -15,6 +15,15 @@ export function getApiBase() {
     return localStorage.getItem("apiHost") ?? "http://localhost:8787";
   }
 
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname &&
+    window.location.hostname !== "localhost" &&
+    !window.location.hostname.endsWith("openfront.io")
+  ) {
+    return window.location.origin;
+  }
+
   return `https://api.${domainname}`;
 }
 

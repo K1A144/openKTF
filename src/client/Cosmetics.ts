@@ -822,11 +822,45 @@ export async function fetchCosmetics(): Promise<Cosmetics | null> {
   }
   const request = (async () => {
     try {
-      const response = await fetch(`${getApiBase()}/cosmetics.json`, {
-        signal: AbortSignal.timeout(COSMETICS_FETCH_TIMEOUT_MS),
-      });
-      if (!response.ok) {
-        console.error(`HTTP error! status: ${response.status}`);
+      let response: Response | null = null;
+      let isTimeout = false;
+      const apiBase = getApiBase();
+      try {
+        response = await fetch(`${apiBase}/cosmetics.json`, {
+          signal: AbortSignal.timeout(COSMETICS_FETCH_TIMEOUT_MS),
+        });
+      } catch (err) {
+        if (
+          err instanceof Error &&
+          (err.name === "TimeoutError" || err.name === "AbortError")
+        ) {
+          isTimeout = true;
+        } else {
+          console.warn("Could not fetch cosmetics from API base:", err);
+        }
+      }
+
+      // If remote API base failed to respond on a browser client, fallback to same-origin /cosmetics.json
+      if (
+        !isTimeout &&
+        !response &&
+        typeof window !== "undefined" &&
+        !process.env.VITEST
+      ) {
+        try {
+          const localResponse = await fetch("/cosmetics.json", {
+            signal: AbortSignal.timeout(COSMETICS_FETCH_TIMEOUT_MS),
+          });
+          if (localResponse.ok) {
+            response = localResponse;
+          }
+        } catch {
+          // ignore local fallback error
+        }
+      }
+
+      if (!response || !response.ok) {
+        console.error(`HTTP error! status: ${response?.status}`);
         return null;
       }
       const result = CosmeticsSchema.safeParse(await response.json());

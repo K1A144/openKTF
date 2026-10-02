@@ -398,6 +398,7 @@ const ROOT_FILE_TYPES: Record<string, string> = {
   ".svg": "image/svg+xml",
   ".pdf": "application/pdf",
   ".zip": "application/zip",
+  ".json": "application/json",
 };
 
 function rootFileContentType(relativePath: string): string {
